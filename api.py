@@ -104,9 +104,9 @@ async def show_menu(update_or_query, context):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     if isinstance(update_or_query, Update):
-        await update_or_query.message.reply_text("Choisis ton marché 🎰:", reply_markup=reply_markup)
+        await update_or_query.message.reply_text("Choose your market 🎰:", reply_markup=reply_markup)
     else:
-        await update_or_query.edit_message_text("Choisis ton marché 🎰:", reply_markup=reply_markup)
+        await update_or_query.edit_message_text("Choose your market 🎰:", reply_markup=reply_markup)
 
 
 # /start
@@ -128,14 +128,14 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         prediction = get_prediction(market)
 
         if not prediction:
-            await query.edit_message_text("Erreur API ❌")
+            await query.edit_message_text("Error API ❌")
             return
 
         msg = build_message(prediction, market)
 
         keyboard = [
-            [InlineKeyboardButton("🔄 Nouvelle prédiction", callback_data=f"market_{market}")],
-            [InlineKeyboardButton("⬅️ Retour", callback_data="menu")]
+            [InlineKeyboardButton("🔄 New prediction", callback_data=f"market_{market}")],
+            [InlineKeyboardButton("⬅️ Back", callback_data="menu")]
         ]
 
         await query.edit_message_text(
