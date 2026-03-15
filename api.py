@@ -36,7 +36,7 @@ def generate_period(market: float) -> str:
     if market == 5:
         counter = base_count_5min
     else:
-        counter = round(base_count_5min * (5 / market))
+        counter = int(base_count_5min * (5 / market))
 
     counter_str = str(counter % 10000).zfill(4)
 
