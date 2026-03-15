@@ -134,7 +134,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = build_message(prediction, market)
 
         keyboard = [
-            [InlineKeyboardButton("🔥 Go to My Channel", url=f"https://t.me/{CHANNEL_ID.strip('@')}")],   # #callback_data=f"market_{market}
+            [InlineKeyboardButton("🔄 New prediction", callback_data=f"market_{market}")], 
             [InlineKeyboardButton("⬅️ Back", callback_data="menu")]
         ]
 
