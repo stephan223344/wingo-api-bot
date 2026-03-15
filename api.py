@@ -134,9 +134,17 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = build_message(prediction, market)
 
         keyboard = [
+<<<<<<< HEAD
             [InlineKeyboardButton("🔄 New prediction", callback_data=f"market_{market}")],   
             [InlineKeyboardButton("⬅️ Back", callback_data="menu")]
         ]
+=======
+                    [InlineKeyboardButton("🔴Go to my channel", url="https://t.me/gowintest")],
+                    [InlineKeyboardButton("🔄 New prediction", callback_data=f"market_{market}")],
+                    [InlineKeyboardButton("⬅️ Back", callback_data="menu")]
+                ]
+
+>>>>>>> 101211f31f0a63934544b6b1b92fd83a2753a2db
 
         await query.edit_message_text(
             text=msg,
