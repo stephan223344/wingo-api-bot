@@ -88,7 +88,7 @@ def generate_period(market: float):
 
     counter = (seconds_since_midnight // interval) + 1
 
-    counter = counter - 328
+    counter = counter - 326
 
     counter_str = str(counter % 10000).zfill(4)
 
@@ -224,7 +224,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     save_user(user_id)
 
     await update.message.reply_text(
-        "Welcome 🎰",
+        "🚀 Welcome to Wingo Predict Bot PRO
+        🎮 The Best Betting Platforms ! 🔥
+        Join the community 👉 @Jalwa_Game_Channel
+        Tutorials, Gifts, Subscribe to Me! 🥰🎁 💶
+        
+        Please select an option below :",
         reply_markup=main_menu_keyboard(user_id)
     )
 
