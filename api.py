@@ -59,6 +59,40 @@ def get_users():
 
 # ---------------- PERIOD ---------------- #
 
+# def generate_period(market: float):
+
+#     ist = pytz.timezone("Asia/Kolkata")
+#     ist_now = datetime.now(ist)
+
+#     date_str = ist_now.strftime("%Y%m%d")
+
+#     prefix = "1000"
+
+#     if market == 1:
+#         market_code = "1"
+#     elif market == 3:
+#         market_code = "2"
+#     elif market == 5:
+#         market_code = "3"
+#     else:
+#         market_code = "5"
+
+#     midnight = ist_now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+#     seconds_since_midnight = int((ist_now - midnight).total_seconds())
+
+#     base_count_5min = seconds_since_midnight // (5 * 60)
+
+#     if market == 5:
+#         counter = base_count_5min
+#     else:
+#         counter = int(base_count_5min * (5 / market))
+
+#     counter_str = str(counter % 10000).zfill(4)
+
+#     return f"{date_str}{prefix}{market_code}{counter_str}"
+
+
 def generate_period(market: float):
 
     ist = pytz.timezone("Asia/Kolkata")
@@ -70,23 +104,24 @@ def generate_period(market: float):
 
     if market == 1:
         market_code = "1"
+        interval = 60
     elif market == 3:
         market_code = "2"
+        interval = 180
     elif market == 5:
         market_code = "3"
+        interval = 300
     else:
         market_code = "5"
+        interval = 30
 
     midnight = ist_now.replace(hour=0, minute=0, second=0, microsecond=0)
 
     seconds_since_midnight = int((ist_now - midnight).total_seconds())
 
-    base_count_5min = seconds_since_midnight // (5 * 60)
+    counter = (seconds_since_midnight // interval) + 1
 
-    if market == 5:
-        counter = base_count_5min
-    else:
-        counter = int(base_count_5min * (5 / market))
+    counter = counter - 328
 
     counter_str = str(counter % 10000).zfill(4)
 
