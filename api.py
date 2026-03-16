@@ -88,7 +88,7 @@ def generate_period(market: float):
 
     counter = (seconds_since_midnight // interval) + 1
 
-    counter = counter - 328
+    counter = counter - 326
 
     counter_str = str(counter % 10000).zfill(4)
 
