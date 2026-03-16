@@ -3,20 +3,69 @@ import requests
 from datetime import datetime
 import pytz
 from dotenv import load_dotenv
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+
+from telegram import (
+    Update,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    ReplyKeyboardMarkup
+)
+
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    CallbackQueryHandler,
+    MessageHandler,
+    filters,
+    ContextTypes
+)
 
 load_dotenv()
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-BASE_URL = "https://indialotteryapi.com/wp-json/wingo/v1"
-CHANNEL_ID = os.getenv("CHANNEL_ID")
 
-# Générer une période en temps réel
-def generate_period(market: float) -> str:
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+CHANNEL_ID = os.getenv("CHANNEL_ID")
+ADMIN_ID = int(os.getenv("ADMIN_ID"))
+
+BASE_URL = "https://indialotteryapi.com/wp-json/wingo/v1"
+
+USERS_FILE = "users.txt"
+
+broadcast_mode = False
+
+
+# ---------------- USERS ---------------- #
+
+def save_user(user_id):
+
+    if not os.path.exists(USERS_FILE):
+        open(USERS_FILE, "w").close()
+
+    with open(USERS_FILE, "r") as f:
+        users = f.read().splitlines()
+
+    if str(user_id) not in users:
+        with open(USERS_FILE, "a") as f:
+            f.write(str(user_id) + "\n")
+
+
+def get_users():
+
+    if not os.path.exists(USERS_FILE):
+        return []
+
+    with open(USERS_FILE, "r") as f:
+        return f.read().splitlines()
+
+
+# ---------------- PERIOD ---------------- #
+
+def generate_period(market: float):
+
     ist = pytz.timezone("Asia/Kolkata")
     ist_now = datetime.now(ist)
 
     date_str = ist_now.strftime("%Y%m%d")
+
     prefix = "1000"
 
     if market == 1:
@@ -29,6 +78,7 @@ def generate_period(market: float) -> str:
         market_code = "5"
 
     midnight = ist_now.replace(hour=0, minute=0, second=0, microsecond=0)
+
     seconds_since_midnight = int((ist_now - midnight).total_seconds())
 
     base_count_5min = seconds_since_midnight // (5 * 60)
@@ -43,130 +93,268 @@ def generate_period(market: float) -> str:
     return f"{date_str}{prefix}{market_code}{counter_str}"
 
 
-# Récupération prediction API
+# ---------------- API ---------------- #
+
 def get_prediction(market):
+
     try:
-        r = requests.get(f"{BASE_URL}/predict", params={"market": market}, timeout=10)
+
+        r = requests.get(
+            f"{BASE_URL}/predict",
+            params={"market": market},
+            timeout=10
+        )
+
         data = r.json()
 
-        if "items" not in data or not data["items"]:
+        if "items" not in data:
             return None
 
         return data["items"][0]
 
-    except Exception as e:
-        print("API ERROR:", e)
+    except:
         return None
 
 
-# Message prediction
 def build_message(prediction, market):
 
-    real_period = generate_period(float(market))
+    period = generate_period(float(market))
 
     return (
+
         f"🎰 Prediction for winGO {market} MIN 🎰\n\n"
-        f"📅 Period: {real_period}\n"
+
+        f"📅 Period: {period}\n"
+
         f"💸 Purchase: {prediction['bigSmall']}\n\n"
+
         f"🔮 Risky Predictions:\n"
+
         f"👉 Colour: {prediction['color']}\n"
-        f"👉 Numbers: {prediction['digit']} or {(prediction['digit']+2) % 10}\n\n"
-        f"💡 Strategy Tip:\nUse the 2x strategy for better chances.\n\n"
-        f"📊 Fund Management:\nAlways play through fund management 5 level."
+
+        f"👉 Numbers: {prediction['digit']} or {(prediction['digit']+2)%10}\n\n"
+
+        f"💡 Strategy Tip:\nUse 2x strategy\n\n"
+
+        f"📊 Fund Management:\n5 level management"
     )
 
 
-# Publication automatique dans channel
+# ---------------- AUTO POST ---------------- #
+
 async def post_prediction(context: ContextTypes.DEFAULT_TYPE):
 
-    market = "1"
-
-    prediction = get_prediction(market)
+    prediction = get_prediction("1")
 
     if not prediction:
         return
 
-    msg = build_message(prediction, market)
+    msg = build_message(prediction, "1")
 
     await context.bot.send_message(chat_id=CHANNEL_ID, text=msg)
 
 
-# Menu principal
-async def show_menu(update_or_query, context):
+# ---------------- MENUS ---------------- #
+
+def main_menu_keyboard(user_id):
 
     keyboard = [
-        [InlineKeyboardButton("30s", callback_data="market_0.5")],
-        [InlineKeyboardButton("1 min", callback_data="market_1")],
-        [InlineKeyboardButton("3 min", callback_data="market_3")],
-        [InlineKeyboardButton("5 min", callback_data="market_5")]
+
+        ["🎰 Prediction"],
+
+        ["🔗 Register"],
+
+        ["📢 Channel"]
+
     ]
 
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    if user_id == ADMIN_ID:
+        keyboard.append(["🛠 Admin"])
 
-    if isinstance(update_or_query, Update):
-        await update_or_query.message.reply_text("Choose your market 🎰:", reply_markup=reply_markup)
-    else:
-        await update_or_query.edit_message_text("Choose your market 🎰:", reply_markup=reply_markup)
+    return ReplyKeyboardMarkup(
+        keyboard,
+        resize_keyboard=True
+    )
 
 
-# /start
+async def show_market_menu(update):
+
+    keyboard = [
+
+        [InlineKeyboardButton("30 Seconds", callback_data="market_0.5")],
+
+        [InlineKeyboardButton("1 Minute", callback_data="market_1")],
+
+        [InlineKeyboardButton("3 Minutes", callback_data="market_3")],
+
+        [InlineKeyboardButton("5 Minutes", callback_data="market_5")]
+
+    ]
+
+    await update.message.reply_text(
+        "Choose Market 🎰",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+
+async def show_admin_menu(update):
+
+    keyboard = [
+
+        [InlineKeyboardButton("📊 Bot Stats", callback_data="admin_stats")],
+
+        [InlineKeyboardButton("📢 Broadcast", callback_data="admin_broadcast")]
+
+    ]
+
+    await update.message.reply_text(
+        "Admin Panel 🛠",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
+
+
+# ---------------- START ---------------- #
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    print("Chat ID :", update.effective_chat.id)
-    await show_menu(update, context)
+
+    user_id = update.effective_user.id
+
+    save_user(user_id)
+
+    await update.message.reply_text(
+        "Welcome 🎰",
+        reply_markup=main_menu_keyboard(user_id)
+    )
 
 
-# Boutons
+# ---------------- MENU HANDLER ---------------- #
+
+async def menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    global broadcast_mode
+
+    text = update.message.text
+
+    user_id = update.effective_user.id
+
+    if text == "🎰 Prediction":
+
+        await show_market_menu(update)
+
+    elif text == "🔗 Register":
+
+        await update.message.reply_text(
+            "Register here:\nhttps://k3jalp2.com/#/register?invitationCode=44233100104"
+        )
+
+    elif text == "📢 Channel":
+
+        await update.message.reply_text(
+            "Join channel:\nhttps://t.me/gowintest"
+        )
+
+    elif text == "🛠 Admin":
+
+        if user_id != ADMIN_ID:
+            return
+
+        await show_admin_menu(update)
+
+    elif broadcast_mode and user_id == ADMIN_ID:
+
+        users = get_users()
+
+        sent = 0
+
+        for user in users:
+
+            try:
+
+                await context.bot.send_message(chat_id=user, text=text)
+
+                sent += 1
+
+            except:
+                pass
+
+        broadcast_mode = False
+
+        await update.message.reply_text(f"Broadcast sent to {sent} users")
+
+
+# ---------------- CALLBACKS ---------------- #
+
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
+    global broadcast_mode
+
     query = update.callback_query
+
     await query.answer()
 
-    if query.data.startswith("market_"):
+    data = query.data
 
-        market = query.data.split("_")[1]
+    if data.startswith("market_"):
+
+        market = data.split("_")[1]
 
         prediction = get_prediction(market)
 
         if not prediction:
-            await query.edit_message_text("Error API ❌")
+
+            await query.edit_message_text("API Error ❌")
+
             return
 
         msg = build_message(prediction, market)
 
         keyboard = [
-<<<<<<< HEAD
-            [InlineKeyboardButton("🔄 New prediction", callback_data=f"market_{market}")],   
-            [InlineKeyboardButton("⬅️ Back", callback_data="menu")]
-        ]
-=======
-                    [InlineKeyboardButton("🔴Go to my channel", url="https://t.me/gowintest")],
-                    [InlineKeyboardButton("🔄 New prediction", callback_data=f"market_{market}")],
-                    [InlineKeyboardButton("⬅️ Back", callback_data="menu")]
-                ]
 
->>>>>>> 101211f31f0a63934544b6b1b92fd83a2753a2db
+            [InlineKeyboardButton("🔄 New Prediction", callback_data=data)]
+
+        ]
 
         await query.edit_message_text(
-            text=msg,
+            msg,
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
 
-    elif query.data == "menu":
-        await show_menu(query, context)
+    elif data == "admin_stats":
+
+        users = len(get_users())
+
+        await query.edit_message_text(
+            f"📊 BOT STATS\n\nUsers: {users}"
+        )
+
+    elif data == "admin_broadcast":
+
+        broadcast_mode = True
+
+        await query.edit_message_text(
+            "Send message to broadcast."
+        )
 
 
-# MAIN
+# ---------------- MAIN ---------------- #
+
 def main():
 
     app = Application.builder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
+
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, menu_handler))
+
     app.add_handler(CallbackQueryHandler(button_handler))
 
-    # job automatique
-    app.job_queue.run_repeating(post_prediction, interval=300, first=10)
+    app.job_queue.run_repeating(
+        post_prediction,
+        interval=300,
+        first=10
+    )
 
-    print("Bot started...")
+    print("Bot started")
 
     app.run_polling()
 
