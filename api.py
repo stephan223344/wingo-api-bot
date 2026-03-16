@@ -60,40 +60,82 @@ def get_users():
 # ---------------- PERIOD ---------------- #
 
 
+# def generate_period(market: float):
+
+#     ist = pytz.timezone("Asia/Kolkata")
+#     ist_now = datetime.now(ist)
+
+#     date_str = ist_now.strftime("%Y%m%d")
+
+#     prefix = "1000"
+
+#     if market == 1:
+#         market_code = "1"
+#         interval = 60
+#     elif market == 3:
+#         market_code = "2"
+#         interval = 180
+#     elif market == 5:
+#         market_code = "3"
+#         interval = 300
+#     else:
+#         market_code = "5"
+#         interval = 30
+
+#     midnight = ist_now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+#     seconds_since_midnight = int((ist_now - midnight).total_seconds())
+
+#     counter = (seconds_since_midnight // interval) + 1
+
+#     counter = counter - 326
+
+#     counter_str = str(counter % 10000).zfill(4)
+
+#     return f"{date_str}{prefix}{market_code}{counter_str}"
+
+
 def generate_period(market: float):
 
     ist = pytz.timezone("Asia/Kolkata")
     ist_now = datetime.now(ist)
 
     date_str = ist_now.strftime("%Y%m%d")
-
     prefix = "1000"
 
     if market == 1:
         market_code = "1"
-        interval = 60
     elif market == 3:
         market_code = "2"
-        interval = 180
     elif market == 5:
         market_code = "3"
-        interval = 300
     else:
         market_code = "5"
-        interval = 30
 
     midnight = ist_now.replace(hour=0, minute=0, second=0, microsecond=0)
 
     seconds_since_midnight = int((ist_now - midnight).total_seconds())
 
-    counter = (seconds_since_midnight // interval) + 1
+    # compteur base 30 secondes
+    base_counter = seconds_since_midnight // 30
 
-    counter = counter - 326
+    base_counter = base_counter - 657
+
+    if market == 0.5:      # 30s
+        counter = base_counter
+
+    elif market == 1:      # 1 min
+        counter = round(base_counter / 2)
+
+    elif market == 3:      # 3 min
+        counter = round(base_counter / 6)
+
+    elif market == 5:      # 5 min
+        counter = round(base_counter / 10)
 
     counter_str = str(counter % 10000).zfill(4)
 
     return f"{date_str}{prefix}{market_code}{counter_str}"
-
 
 # ---------------- API ---------------- #
 
@@ -224,12 +266,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     save_user(user_id)
 
     await update.message.reply_text(
-        "🚀 Welcome to Wingo Predict Bot PRO
-        🎮 The Best Betting Platforms ! 🔥
-        Join the community 👉 @Jalwa_Game_Channel
-        Tutorials, Gifts, Subscribe to Me! 🥰🎁 💶
-        
-        Please select an option below :",
+        "🚀 Welcome to Wingo Predict Bot PRO 🎮 The Best Betting Platforms ! 🔥 Join the community 👉 @Jalwa_Game_Channel Tutorials, Gifts, Subscribe to Me! 🥰🎁 💶 Please select an option below :",
         reply_markup=main_menu_keyboard(user_id)
     )
 
