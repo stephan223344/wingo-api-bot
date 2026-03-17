@@ -97,7 +97,10 @@ def generate_period(market: float):
     elif market == 5:      # 5 min
         counter = round(base_counter / 10)
 
-    counter_str = str(counter % 10000).zfill(4)
+    if counter < 10000:
+        counter_str = str(counter).zfill(4)
+    else:
+        counter_str = str(counter)
 
     return f"{date_str}{prefix}{market_code}{counter_str}"
 
