@@ -1,18 +1,23 @@
+import json
 import os
 
-USERS_FILE = "users.txt"
+FILE = "users.json"
 
-def get_users() -> list[str]:
-    if not os.path.exists(USERS_FILE):
+def load_users():
+    if not os.path.exists(FILE):
         return []
+    with open(FILE, "r") as f:
+        return json.load(f)
 
-    with open(USERS_FILE, "r") as f:
-        return f.read().splitlines()
+def save_users(users):
+    with open(FILE, "w") as f:
+        json.dump(users, f)
 
+def save_user(user_id):
+    users = load_users()
+    if user_id not in users:
+        users.append(user_id)
+        save_users(users)
 
-def save_user(user_id: int):
-    users = get_users()
-
-    if str(user_id) not in users:
-        with open(USERS_FILE, "a") as f:
-            f.write(f"{user_id}\n")
+def get_users():
+    return load_users()

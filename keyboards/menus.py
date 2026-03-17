@@ -4,8 +4,8 @@ from config import ADMIN_ID
 def main_menu(user_id: int):
     keyboard = [
         ["🎰 Prediction"],
-        ["🔗 Register"],
-        ["📢 Channel"]
+        ["🔗 Register Link"],
+        ["📢 Prediction Channel"]
     ]
 
     if user_id == ADMIN_ID:
