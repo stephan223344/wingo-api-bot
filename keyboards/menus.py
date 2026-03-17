@@ -16,7 +16,6 @@ def main_menu(user_id: int):
 
 def market_menu():
     keyboard = [
-        [InlineKeyboardButton("30 Seconds", callback_data="market_0.5")],
         [InlineKeyboardButton("1 Minute", callback_data="market_1")],
         [InlineKeyboardButton("3 Minutes", callback_data="market_3")],
         [InlineKeyboardButton("5 Minutes", callback_data="market_5")],
