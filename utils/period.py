@@ -2,7 +2,7 @@ from datetime import datetime
 import pytz
 
 # 🔥 OFFSET UNIQUE basé sur le 30s (à ajuster une seule fois)
-OFFSET = 658
+OFFSET = 657
 
 def generate_period(market: float):
     ist = pytz.timezone("Asia/Kolkata")
