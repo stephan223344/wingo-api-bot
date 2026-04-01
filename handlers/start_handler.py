@@ -8,6 +8,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     save_user(user_id)
 
     await update.message.reply_text(
-        "🚀 Welcome to Wingo Predict Bot PRO 🎮 The Best Betting Platforms ! 🔥 Join the community 👉 @Jalwa_Game_Channel Tutorials, Gifts, Subscribe to Me! 🥰🎁 💶 Please select an option below :",
+        "🚀 Welcome to Wingo Predict Bot PRO 🎮 The Best Betting Platforms ! 🔥 Join the community 👉 @jaiclub_official_channel Tutorials, Gifts, Subscribe to Me! 🥰🎁 💶 Please select an option below :",
         reply_markup=main_menu(user_id)
     )

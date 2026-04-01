@@ -30,13 +30,13 @@ async def menu_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # 🔗 Register
     elif text == "🔗 Register Link":
         await update.message.reply_text(
-            "🔗 Register Link:\nhttps://k3jalp2.com/#/register?invitationCode=44233100104"
+            "🔗 Register Link:\nhttps://www.jaiclub.me/#/register"
         )
 
     # 📢 Channel
     elif text == "📢 Prediction Channel":
         await update.message.reply_text(
-            "✅ Fast Predictions:\nhttps://t.me/gowintest"
+            "✅ Fast Predictions:\nhttps://t.me/jaiclub_official_channel"
         )
 
     # 🛠 Admin

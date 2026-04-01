@@ -46,7 +46,7 @@ async def auto_post(context: ContextTypes.DEFAULT_TYPE):
 
         keyboard = [[InlineKeyboardButton(
             "🔥 PLAY NOW",
-            url="https://k3jalp2.com/#/register?invitationCode=44233100104"
+            url="https://www.jaiclub.me/#/"  ###"https://k3jalp2.com/#/register?invitationCode=44233100104"
         )]]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -78,7 +78,7 @@ def main():
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.Sticker.ALL, get_sticker_id))
 
-    app.job_queue.run_repeating(auto_post, interval=5000, first=10)
+    app.job_queue.run_repeating(auto_post, interval=25000, first=10)
 
     print("✅ Bot started (polling + Flask keep-alive)")
     app.run_polling(drop_pending_updates=True)
