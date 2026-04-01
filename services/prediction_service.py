@@ -11,7 +11,7 @@ def build_message(prediction: dict, market: str) -> str:
 💸 Purchase: {prediction['bigSmall']}
 
 🔮 Risky Predictions:
-👉 Colour: {prediction['color']}
+👉 Color: {prediction['color']}
 👉 Numbers: {digit} or {(digit + 2) % 10}
 
 💡 Strategy Tip:
