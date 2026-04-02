@@ -50,18 +50,23 @@ async def auto_post(context: ContextTypes.DEFAULT_TYPE):
         )]]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
-        with open(photo_path, "rb") as photo:
-            await context.bot.send_photo(
-                chat_id=CHANNEL_ID,
-                photo=photo,
-                caption=msg,
-                reply_markup=reply_markup
-            )
+        for channel in CHANNEL_ID:
+            try:
+                with open(photo_path, "rb") as photo:
+                    await context.bot.send_photo(
+                        chat_id=CHANNEL_ID,
+                        photo=photo,
+                        caption=msg,
+                        reply_markup=reply_markup
+                    )
 
-        await context.bot.send_sticker(
-            chat_id=CHANNEL_ID,
-            sticker="CAACAgUAAxkBAAIDi2m36V2DW5fQFOzsbGdOVhe_r1ocAAJSAwAC0qoBVU3NipS4NOxCOgQ"
-        )
+                await context.bot.send_sticker(
+                    chat_id=CHANNEL_ID,
+                    sticker="CAACAgUAAxkBAAIDi2m36V2DW5fQFOzsbGdOVhe_r1ocAAJSAwAC0qoBVU3NipS4NOxCOgQ"
+                )
+                print(f"Message sent to {channel}")
+            except Exception as e:
+                print(f"Error sending to {channel} : {e}")
     except Exception as e:
         print(f"Autopost error: {e}")
 
@@ -78,7 +83,7 @@ def main():
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.Sticker.ALL, get_sticker_id))
 
-    app.job_queue.run_repeating(auto_post, interval=25000, first=10)
+    app.job_queue.run_repeating(auto_post, interval=1000, first=10)
 
     print("✅ Bot started (polling + Flask keep-alive)")
     app.run_polling(drop_pending_updates=True)
