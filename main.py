@@ -54,14 +54,14 @@ async def auto_post(context: ContextTypes.DEFAULT_TYPE):
             try:
                 with open(photo_path, "rb") as photo:
                     await context.bot.send_photo(
-                        chat_id=CHANNEL_ID,
+                        chat_id=channel.strip(),
                         photo=photo,
                         caption=msg,
                         reply_markup=reply_markup
                     )
 
                 await context.bot.send_sticker(
-                    chat_id=CHANNEL_ID,
+                    chat_id=channel.strip(),
                     sticker="CAACAgUAAxkBAAIDi2m36V2DW5fQFOzsbGdOVhe_r1ocAAJSAwAC0qoBVU3NipS4NOxCOgQ"
                 )
                 print(f"Message sent to {channel}")
@@ -83,7 +83,7 @@ def main():
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.Sticker.ALL, get_sticker_id))
 
-    app.job_queue.run_repeating(auto_post, interval=1000, first=10)
+    app.job_queue.run_repeating(auto_post, interval=10000, first=10)
 
     print("✅ Bot started (polling + Flask keep-alive)")
     app.run_polling(drop_pending_updates=True)
