@@ -83,7 +83,7 @@ def main():
     app.add_handler(CallbackQueryHandler(callback_handler))
     app.add_handler(MessageHandler(filters.Sticker.ALL, get_sticker_id))
 
-    app.job_queue.run_repeating(auto_post, interval=10000, first=10)
+    app.job_queue.run_repeating(auto_post, interval=3600, first=10)
 
     print("✅ Bot started (polling + Flask keep-alive)")
     app.run_polling(drop_pending_updates=True)
