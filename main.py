@@ -19,13 +19,13 @@ from services.api_service import get_prediction
 from services.prediction_service import build_message
 
 # ─── Flask keep-alive server ──────────────────────────────────────────────────
-app = Flask(__name__)
+flask_app = Flask(__name__)
 
-@app.route("/")
+@flask_app.route("/")
 def index():
     return "✅ Wingo Bot is running!", 200
 
-@app.route("/health")
+@flask_app.route("/health")
 def health():
     return "OK", 200
 
