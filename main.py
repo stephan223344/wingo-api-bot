@@ -61,7 +61,7 @@ async def auto_post(context: ContextTypes.DEFAULT_TYPE):
                     )
 
                 await context.bot.send_sticker(
-                    chat_id=channel.strip(),²
+                    chat_id=channel.strip(),
                     sticker="CAACAgUAAxkBAAIDi2m36V2DW5fQFOzsbGdOVhe_r1ocAAJSAwAC0qoBVU3NipS4NOxCOgQ"
                 )
                 print(f"Message sent to {channel}")
