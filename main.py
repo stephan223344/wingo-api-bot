@@ -19,19 +19,19 @@ from services.api_service import get_prediction
 from services.prediction_service import build_message
 
 # ─── Flask keep-alive server ──────────────────────────────────────────────────
-flask_app = Flask(__name__)
+app = Flask(__name__)
 
-@flask_app.route("/")
-def index():
-    return "✅ Wingo Bot is running!", 200
+@app.route("/")
 
-@flask_app.route("/health")
-def health():
-    return "OK", 200
+def home():
+    return "OK"
 
 def run_flask():
     port = int(os.environ.get("PORT", 8080))
-    flask_app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port)
+
+if __name__ == "__main__":
+    threading.Thread(target=run_flask).start()
 
 # ─── Auto-post job ────────────────────────────────────────────────────────────
 async def auto_post(context: ContextTypes.DEFAULT_TYPE):
@@ -61,7 +61,7 @@ async def auto_post(context: ContextTypes.DEFAULT_TYPE):
                     )
 
                 await context.bot.send_sticker(
-                    chat_id=channel.strip(),²
+                    chat_id=channel.strip(),
                     sticker="CAACAgUAAxkBAAIDi2m36V2DW5fQFOzsbGdOVhe_r1ocAAJSAwAC0qoBVU3NipS4NOxCOgQ"
                 )
                 print(f"Message sent to {channel}")
